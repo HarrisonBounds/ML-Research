@@ -2,10 +2,11 @@ import dask.dataframe as dd
 from dask_ml.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 path = 'E:\CICIoT2023'
-
-df = dd.read_csv(path + '\*.csv')
+fraction = 0.1
+df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
 
 #column that contains the labels
 label_column = 'label'
@@ -22,6 +23,27 @@ label_encoder = LabelEncoder()
 y_train_encoded = label_encoder.fit_transform(y_train)
 y_test_encoded = label_encoder.fit_transform(y_test)
 
+#Train the model
+print("Training")
+classifier = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=50)
+classifier.fit(X_train, y_train_encoded)
+
+print("Predicting")
+y_pred = classifier.predict(X_test)
+
+#Evaluate model
+accuracy = accuracy_score(y_test_encoded, y_pred)
+precision = precision_score(y_test_encoded, y_pred, average='weighted')
+recall = recall_score(y_test_encoded, y_pred, average='weighted')
+f1 = f1_score(y_test_encoded, y_pred, average='weighted')
+
+print("=============================================================")
+
+print("Accuracy: ", accuracy)
+print("Precision: ", precision)
+print("Recall: ", recall)
+print("F1 score: ", f1)
+
 def view_data():
     #Checking the results
     print("Total rows: ", len(df))
@@ -35,8 +57,6 @@ def view_data():
     print("X_test example: ", X_test.head())
     print("y_train example: ", y_train.head())
     print("y_test example: ", y_test.head())
-
-view_data()
 
 
 
