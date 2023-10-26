@@ -1,12 +1,17 @@
 import dask.dataframe as dd
 from dask_ml.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 path = 'E:\CICIoT2023'
-fraction = 0.1
+fraction = 0.2
 df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
+
+print("Total Number of rows: ", df.shape[0].compute())
 
 #column that contains the labels
 label_column = 'label'
@@ -23,19 +28,40 @@ label_encoder = LabelEncoder()
 y_train_encoded = label_encoder.fit_transform(y_train)
 y_test_encoded = label_encoder.fit_transform(y_test)
 
+class_names = label_encoder.classes_
+print("Number of classes: ", len(class_names))
+print("Class Names:")
+for class_name in class_names:
+    print(class_name)
+
+# Define a simple neural network model
+model = keras.Sequential([
+    layers.Input(shape=(X_train.shape[1],)),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(len(label_encoder.classes_), activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
 #Train the model
 print("Training")
-classifier = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=50)
-classifier.fit(X_train, y_train_encoded)
+model.fit(X_train.compute(), y_train_encoded, epochs=10, batch_size=64)
+
+# classifier = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=50)
+# classifier.fit(X_train, y_train_encoded)
 
 print("Predicting")
-y_pred = classifier.predict(X_test)
+y_pred = model.predict(X_test.compute())
+y_pred_classes = y_pred.argmax(axis=1)
+
+# y_pred = classifier.predict(X_test)
 
 #Evaluate model
-accuracy = accuracy_score(y_test_encoded, y_pred)
-precision = precision_score(y_test_encoded, y_pred, average='weighted')
-recall = recall_score(y_test_encoded, y_pred, average='weighted')
-f1 = f1_score(y_test_encoded, y_pred, average='weighted')
+accuracy = accuracy_score(y_test_encoded, y_pred_classes)
+precision = precision_score(y_test_encoded, y_pred_classes, average='weighted')
+recall = recall_score(y_test_encoded, y_pred_classes, average='weighted')
+f1 = f1_score(y_test_encoded, y_pred_classes, average='weighted')
 
 print("=============================================================")
 
