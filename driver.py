@@ -6,71 +6,92 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-path = 'E:\CICIoT2023'
-fraction = 0.2
-df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
+def encode_labels(y_train, y_test):
+    #Covert the text labels to numbers so the model can understand it
+    label_encoder = LabelEncoder()
 
-print("Total Number of rows: ", df.shape[0].compute())
+    y_train_encoded = label_encoder.fit_transform(y_train)
+    y_test_encoded = label_encoder.fit_transform(y_test)
 
-#column that contains the labels
-label_column = 'label'
+    class_names = label_encoder.classes_
 
-X_train, X_test, y_train, y_test = train_test_split(df, df[label_column], test_size=0.20, shuffle=True)
+    return y_train_encoded, y_test_encoded, class_names
 
-#Drop the labels from the training set
-X_train = X_train.drop(label_column, axis=1)
-X_test = X_test.drop(label_column, axis=1)
+def binary_classification(X_train, y_train, X_test, y_test, num_trees):
+    positive_class = "BenignTraffic"
 
-#Covert the text labels to numbers so the model can understand it
-label_encoder = LabelEncoder()
+    #Create binary labels where benign is 1 and malicious is 0
+    y_train_binary = (y_train == positive_class).astype(int)
+    y_test_binary = (y_test == positive_class).astype(int)
 
-y_train_encoded = label_encoder.fit_transform(y_train)
-y_test_encoded = label_encoder.fit_transform(y_test)
+    #Training binary classifier
+    binary_classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
+    binary_classifier.fit(X_train, y_train_binary)
 
-class_names = label_encoder.classes_
-print("Number of classes: ", len(class_names))
-print("Class Names:")
-for class_name in class_names:
-    print(class_name)
+    # Predict using the binary classifier
+    y_pred_binary = binary_classifier.predict(X_test)
+    y_pred_prob_binary = binary_classifier.predict_proba(X_test)[:, 1]  # Use the probability for the positive class
 
-# Define a simple neural network model
-model = keras.Sequential([
-    layers.Input(shape=(X_train.shape[1],)),
-    layers.Dense(64, activation='relu'),
-    layers.Dense(32, activation='relu'),
-    layers.Dense(len(label_encoder.classes_), activation='softmax')
-])
+    return y_test_binary, y_pred_binary, y_pred_prob_binary
 
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-#Train the model
-print("Training")
-model.fit(X_train.compute(), y_train_encoded, epochs=10, batch_size=64)
+def multi_class_classification(X_train, y_train, X_test, num_trees):
+    print("Training...")
+    classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
+    classifier.fit(X_train, y_train)
 
-# classifier = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=50)
-# classifier.fit(X_train, y_train_encoded)
+    print("Predicting...")
+    y_pred = classifier.predict(X_test)
+    y_pred_prob = classifier.predict_proba(X_test)
 
-print("Predicting")
-y_pred = model.predict(X_test.compute())
-y_pred_classes = y_pred.argmax(axis=1)
+    return y_pred, y_pred_prob
 
-# y_pred = classifier.predict(X_test)
+def evaluate(y_test, y_pred, y_pred_prob, class_names):
+    print("=====================================================\n")
+    print("Overall")
+    print("=========")
 
-#Evaluate model
-accuracy = accuracy_score(y_test_encoded, y_pred_classes)
-precision = precision_score(y_test_encoded, y_pred_classes, average='weighted')
-recall = recall_score(y_test_encoded, y_pred_classes, average='weighted')
-f1 = f1_score(y_test_encoded, y_pred_classes, average='weighted')
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
 
-print("=============================================================")
+    print(f'Accuracy: {accuracy}')
+    print(f'Precision: {precision}')
+    print(f'Recall Score: {recall}')
+    print(f'f1 Score: {f1}')
 
-print("Accuracy: ", accuracy)
-print("Precision: ", precision)
-print("Recall: ", recall)
-print("F1 score: ", f1)
+    print("Per Class Metrics")
+    print("==================")
 
-def view_data():
+    class_accuracies = accuracy_score(y_test, y_pred, average=None)
+    class_precisions = precision_score(y_test, y_pred, average=None)
+    class_recalls = recall_score(y_test, y_pred, average=None)
+    class_f1_scores = f1_score(y_test, y_pred, average=None)
+
+    for i, class_name in class_names:
+        print(f'Class: {class_name}')
+        print(f'Probabilities: {y_pred_prob[:, i]}')
+        print(f'Accuracy: {class_accuracies[i]}')
+        print(f'Precision: {class_precisions[i]}')
+        print(f'Recall: {class_recalls[i]}')
+        print(f'F1 Score: {class_f1_scores[i]}')
+
+def show_confusion_matrix(y_test, y_pred, model, class_names):
+    confusion_mat = confusion_matrix(y_test, y_pred)
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title(f'Confusion Matrix for {model} Random Forest Classification')
+    plt.show()
+
+def view_data(df, X_train, y_train, X_test, y_test):
     #Checking the results
     print("Total rows: ", len(df))
     print("X_train shape: ", X_train.shape[0].compute())
@@ -83,6 +104,39 @@ def view_data():
     print("X_test example: ", X_test.head())
     print("y_train example: ", y_train.head())
     print("y_test example: ", y_test.head())
+
+def main():
+    path = 'E:\CICIoT2023'
+    fraction = 0.5
+    num_trees = 500
+
+    df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
+
+    #Split data into training and testing
+    label_column = 'label'
+
+    X_train, X_test, y_train, y_test = train_test_split(df, df[label_column], test_size=0.20, shuffle=True)
+
+    #Drop the labels from the training set
+    X_train = X_train.drop(label_column, axis=1)
+    X_test = X_test.drop(label_column, axis=1)
+
+    #Get the encoded labels
+    y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
+
+    #Model you want to run
+    y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
+
+    #Evaluate the model
+    evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
+
+    #Display confusion matrix
+    show_confusion_matrix(y_test_encoded, y_pred, 'Multi-class', class_names)
+
+if __name__ == "__main__":
+    main()
+
+
 
 
 
