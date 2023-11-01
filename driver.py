@@ -106,11 +106,11 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
 def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
 
-    plt.figure(figsize=(12, 16))
+    plt.figure(figsize=(16, 12))
     sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
-    plt.title(f'Confusion Matrix for {model} Random Forest Classification with {num_trees} number of Trees')
+    plt.title(f'Confusion Matrix for {model} Random Forest Classification with {num_trees} Trees')
     plt.show()
 
 def view_data(df, X_train, y_train, X_test, y_test):
