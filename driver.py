@@ -40,14 +40,14 @@ def binary_classification(X_train, y_train, X_test, y_test, num_trees):
     return y_test_binary, y_pred_binary, y_pred_prob_binary
 
 
-def multi_class_classification(X_train, y_train, X_test, num_trees):
+def multi_class_classification(X_train, y_train, X_test, num_trees, fraction):
     print("Training...")
     start_time = time.time()
     classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
     classifier.fit(X_train, y_train)
     end_time = time.time()
 
-    print(f'It took {(end_time-start_time)/60} minutes to train')
+    print(f'It took {(end_time-start_time)/60} minutes to train for {fraction*100}% of the data set')
 
     print("Predicting...")
     start_time = time.time()
@@ -79,10 +79,6 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
 
     for i, class_name in enumerate(class_names):
         print(f'Class: {class_name}')
-        
-        # Print the probabilities for each example
-        for example_index, prob in enumerate(y_pred_prob[:, i]):
-            print(f'Example {example_index + 1}: Probability = {prob:.4f}')
 
         class_accuracy = accuracy_score(y_test, y_pred)
         class_precision = precision_score(y_test, y_pred, average=None)[i]
@@ -110,7 +106,7 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
 def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
 
-    plt.figure(figsize=(12, 12))
+    plt.figure(figsize=(12, 16))
     sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
@@ -133,7 +129,7 @@ def view_data(df, X_train, y_train, X_test, y_test):
 
 def main():
     path = 'E:\CICIoT2023'
-    fraction = 0.3
+    fraction = 0.5
     num_trees = 100
 
     df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
@@ -152,7 +148,7 @@ def main():
     y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
 
     #Model you want to run
-    y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
+    y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees, fraction)
 
     #Evaluate the model
     evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
