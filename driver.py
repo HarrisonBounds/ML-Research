@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import time
 
 def encode_labels(y_train, y_test):
     #Covert the text labels to numbers so the model can understand it
@@ -41,12 +42,20 @@ def binary_classification(X_train, y_train, X_test, y_test, num_trees):
 
 def multi_class_classification(X_train, y_train, X_test, num_trees):
     print("Training...")
+    start_time = time.time()
     classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
     classifier.fit(X_train, y_train)
+    end_time = time.time()
+
+    print(f'It took {(end_time-start_time)/60} minutes to train')
 
     print("Predicting...")
+    start_time = time.time()
     y_pred = classifier.predict(X_test)
     y_pred_prob = classifier.predict_proba(X_test)
+    end_time = time.time()
+
+    print(f'It took {(end_time-start_time)/60} minutes to predict')
 
     return y_pred, y_pred_prob
 
@@ -56,9 +65,9 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
     print("=========")
 
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
 
     print(f'Accuracy: {accuracy}')
     print(f'Precision: {precision}')
@@ -68,27 +77,44 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
     print("Per Class Metrics")
     print("==================")
 
-    class_accuracies = accuracy_score(y_test, y_pred, average=None)
-    class_precisions = precision_score(y_test, y_pred, average=None)
-    class_recalls = recall_score(y_test, y_pred, average=None)
-    class_f1_scores = f1_score(y_test, y_pred, average=None)
-
-    for i, class_name in class_names:
+    for i, class_name in enumerate(class_names):
         print(f'Class: {class_name}')
-        print(f'Probabilities: {y_pred_prob[:, i]}')
-        print(f'Accuracy: {class_accuracies[i]}')
-        print(f'Precision: {class_precisions[i]}')
-        print(f'Recall: {class_recalls[i]}')
-        print(f'F1 Score: {class_f1_scores[i]}')
+        
+        # Print the probabilities for each example
+        for example_index, prob in enumerate(y_pred_prob[:, i]):
+            print(f'Example {example_index + 1}: Probability = {prob:.4f}')
 
-def show_confusion_matrix(y_test, y_pred, model, class_names):
+        class_accuracy = accuracy_score(y_test, y_pred)
+        class_precision = precision_score(y_test, y_pred, average=None)[i]
+        class_recall = recall_score(y_test, y_pred, average=None)[i]
+        class_f1_score = f1_score(y_test, y_pred, average=None)[i]
+
+        print(f'Accuracy: {class_accuracy}')
+        print(f'Precision: {class_precision}')
+        print(f'Recall: {class_recall}')
+        print(f'F1 Score: {class_f1_score}')
+
+    # class_accuracies = accuracy_score(y_test, y_pred)
+    # class_precisions = precision_score(y_test, y_pred, average=None)
+    # class_recalls = recall_score(y_test, y_pred, average=None)
+    # class_f1_scores = f1_score(y_test, y_pred, average=None)
+
+    # for i, class_name in enumerate(class_names):
+    #     print(f'Class: {class_name}')
+    #     print(f'Probabilities: {y_pred_prob[:, i]}')
+    #     print(f'Accuracy: {class_accuracies[i]}')
+    #     print(f'Precision: {class_precisions[i]}')
+    #     print(f'Recall: {class_recalls[i]}')
+    #     print(f'F1 Score: {class_f1_scores[i]}')
+
+def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(12, 12))
     sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
-    plt.title(f'Confusion Matrix for {model} Random Forest Classification')
+    plt.title(f'Confusion Matrix for {model} Random Forest Classification with {num_trees} number of Trees')
     plt.show()
 
 def view_data(df, X_train, y_train, X_test, y_test):
@@ -107,10 +133,11 @@ def view_data(df, X_train, y_train, X_test, y_test):
 
 def main():
     path = 'E:\CICIoT2023'
-    fraction = 0.5
-    num_trees = 500
+    fraction = 0.3
+    num_trees = 100
 
     df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
+    df = df.compute()
 
     #Split data into training and testing
     label_column = 'label'
@@ -131,7 +158,7 @@ def main():
     evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
 
     #Display confusion matrix
-    show_confusion_matrix(y_test_encoded, y_pred, 'Multi-class', class_names)
+    show_confusion_matrix(y_test_encoded, y_pred, 'Multi-class', class_names, num_trees)
 
 if __name__ == "__main__":
     main()
