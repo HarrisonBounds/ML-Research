@@ -18,6 +18,9 @@ def encode_labels(y_train, y_test):
     y_train_encoded = label_encoder.fit_transform(y_train)
     y_test_encoded = label_encoder.fit_transform(y_test)
 
+    print("Y train encoded: ", y_train_encoded)
+    print("Y test encoded: ", y_test_encoded)
+
     class_names = label_encoder.classes_
 
     return y_train_encoded, y_test_encoded, class_names
@@ -40,11 +43,11 @@ def binary_classification(X_train, y_train, X_test, y_test, num_trees):
     return y_test_binary, y_pred_binary, y_pred_prob_binary
 
 
-def multi_class_classification(X_train, y_train, X_test, num_trees, fraction):
+def multi_class_classification(X_train, y_train_encoded, X_test, num_trees, fraction):
     print("Training...")
     start_time = time.time()
     classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
-    classifier.fit(X_train, y_train)
+    classifier.fit(X_train, y_train_encoded)
     end_time = time.time()
 
     print(f'It took {(end_time-start_time)/60} minutes to train for {fraction*100}% of the data set')
@@ -128,15 +131,15 @@ def view_data(df, X_train, y_train, X_test, y_test):
     print("y_test example: ", y_test.head())
 
 def main():
-    path = 'E:\CICIoT2023'
-    fraction = 0.5
+    path = 'E:\Malware Data Set'
+    fraction = 1
     num_trees = 100
 
-    df = dd.read_csv(path + '\*.csv').sample(frac=fraction)
+    df = dd.read_csv(path + '\*.csv', assume_missing=True).sample(frac=fraction)
     df = df.compute()
 
     #Split data into training and testing
-    label_column = 'label'
+    label_column = 'Category'
 
     X_train, X_test, y_train, y_test = train_test_split(df, df[label_column], test_size=0.20, shuffle=True)
 
