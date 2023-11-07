@@ -18,9 +18,6 @@ def encode_labels(y_train, y_test):
     y_train_encoded = label_encoder.fit_transform(y_train)
     y_test_encoded = label_encoder.fit_transform(y_test)
 
-    print("Y train encoded: ", y_train_encoded)
-    print("Y test encoded: ", y_test_encoded)
-
     class_names = label_encoder.classes_
 
     return y_train_encoded, y_test_encoded, class_names
@@ -46,7 +43,7 @@ def binary_classification(X_train, y_train, X_test, y_test, num_trees):
 def multi_class_classification(X_train, y_train_encoded, X_test, num_trees, fraction):
     print("Training...")
     start_time = time.time()
-    classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy', class_weight='balanced', random_state=50)
+    classifier = RandomForestClassifier(n_estimators=num_trees, max_depth=6, criterion='entropy')
     classifier.fit(X_train, y_train_encoded)
     end_time = time.time()
 
@@ -136,16 +133,18 @@ def main():
     num_trees = 100
 
     df = dd.read_csv(path + '\*.csv', assume_missing=True).sample(frac=fraction)
-    df = df.compute()
 
     #Split data into training and testing
     label_column = 'Category'
+    class_column = 'Class'
 
     X_train, X_test, y_train, y_test = train_test_split(df, df[label_column], test_size=0.20, shuffle=True)
 
     #Drop the labels from the training set
     X_train = X_train.drop(label_column, axis=1)
     X_test = X_test.drop(label_column, axis=1)
+    X_train = X_train.drop(class_column, axis=1)
+    X_test = X_test.drop(class_column, axis=1)
 
     #Get the encoded labels
     y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
