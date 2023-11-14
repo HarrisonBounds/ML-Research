@@ -47,7 +47,7 @@ def binary_classification(X_train, y_train, X_test, y_test, num_trees):
 def multi_class_classification(X_train, y_train_encoded, X_test, num_trees):
     print("Training...")
     start_time = time.time()
-    classifier = RandomForestClassifier(n_estimators=num_trees, max_depth=6, criterion='entropy')
+    classifier = RandomForestClassifier(n_estimators=num_trees, criterion='entropy')
     classifier.fit(X_train, y_train_encoded)
     end_time = time.time()
 
@@ -69,43 +69,12 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
     print("=========")
 
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
 
     print(f'Accuracy: {accuracy}')
     # print(f'Precision: {precision}')
     # print(f'Recall Score: {recall}')
     print(f'f1 Score: {f1}')
-
-    # print("Per Class Metrics")
-    # print("==================")
-
-    # for i, class_name in enumerate(class_names):
-    #     print(f'Class: {class_name}')
-
-    #     class_accuracy = accuracy_score(y_test, y_pred)
-    #     class_precision = precision_score(y_test, y_pred, average=None)[i]
-    #     class_recall = recall_score(y_test, y_pred, average=None)[i]
-    #     class_f1_score = f1_score(y_test, y_pred, average=None)[i]
-
-    #     print(f'Accuracy: {class_accuracy}')
-    #     print(f'Precision: {class_precision}')
-    #     print(f'Recall: {class_recall}')
-    #     print(f'F1 Score: {class_f1_score}')
-
-    # class_accuracies = accuracy_score(y_test, y_pred)
-    # class_precisions = precision_score(y_test, y_pred, average=None)
-    # class_recalls = recall_score(y_test, y_pred, average=None)
-    # class_f1_scores = f1_score(y_test, y_pred, average=None)
-
-    # for i, class_name in enumerate(class_names):
-    #     print(f'Class: {class_name}')
-    #     print(f'Probabilities: {y_pred_prob[:, i]}')
-    #     print(f'Accuracy: {class_accuracies[i]}')
-    #     print(f'Precision: {class_precisions[i]}')
-    #     print(f'Recall: {class_recalls[i]}')
-    #     print(f'F1 Score: {class_f1_scores[i]}')
 
 def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
@@ -117,23 +86,9 @@ def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
     plt.title(f'Confusion Matrix for {model} Random Forest Classification with {num_trees} Trees')
     plt.show()
 
-def view_data(df, X_train, y_train, X_test, y_test):
-    #Checking the results
-    print("Total rows: ", len(df))
-    print("X_train shape: ", X_train.shape[0].compute())
-    print("X_test shape: ", X_test.shape[0].compute())
-    print("y_train shape: ", y_train.shape[0].compute())
-    print("y_test shape: ", y_test.shape[0].compute())
-
-    print("Examples\n")
-    print("X_train example: ", X_train.head())
-    print("X_test example: ", X_test.head())
-    print("y_train example: ", y_train.head())
-    print("y_test example: ", y_test.head())
-
 def main():
     path = 'E:\\Malware Data Set\\Obfuscated-MalMem2022.csv'
-    num_trees = 100
+    num_trees = 5000
 
     df = pd.read_csv(path)
 
@@ -141,14 +96,17 @@ def main():
     label_column = 'Category'
     class_column = 'Class'
 
+    #Only classify Spyware, Ransomware, and Trojan
+    df = df[df[label_column] != 'Benign']
+
     X = df.drop([label_column, class_column], axis=1)
     y = df[label_column]
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, shuffle=True)
 
     # Clip the "Category" values
-    y_train = y_train.str.split('-').str.get(0)
-    y_test = y_test.str.split('-').str.get(0)
+    y_train = y_train.str.split('-').str.slice(stop=2).str.join('-')
+    y_test = y_test.str.split('-').str.slice(stop=2).str.join('-')
 
     #Get the encoded labels
     y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
