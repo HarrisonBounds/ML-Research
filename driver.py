@@ -12,6 +12,12 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+from sdv.single_table import CTGANSynthesizer
+from sdv.metadata import SingleTableMetadata
+import sys
+sys.path.append('E:\ML-Research\CTABGAN')
+from CTABGAN import ctabgan
+
 
 def encode_labels(y_train, y_test):
     #Covert the text labels to numbers so the model can understand it
@@ -25,6 +31,40 @@ def encode_labels(y_train, y_test):
     print("Class names: ", class_names)
 
     return y_train_encoded, y_test_encoded, class_names
+
+def generate_data(df, gan_model, num_generated_rows, label_column, path):
+    if gan_model == 'ctgan':
+        #Convert dataframe into metadata
+        metadata = SingleTableMetadata()
+        metadata.detect_from_dataframe(df)
+
+        #Generate synthetic data
+        print("Generating Synthetic Data...")
+        synthesizer = CTGANSynthesizer(metadata, verbose=True)
+        synthesizer.fit(df)
+
+        synthetic_data = synthesizer.sample(num_rows=num_generated_rows)
+    elif gan_model == 'ctabgan':
+        ctabgan_instance = ctabgan.CTABGAN(path, 0.2, [], [], [], ['pslist.nproc', 'pslist.nppid', 'pslist.avg_threads',	'pslist.nprocs64bit', 'pslist.avg_handlers', 'dlllist.ndlls',
+                                                    'dlllist.avg_dlls_per_proc',	'handles.nhandles',	'handles.avg_handles_per_proc',	'handles.nport',	'handles.nfile',	
+                                                    'handles.nevent',	'handles.ndesktop',	'handles.nkey',	'handles.nthread',	'handles.ndirectory',	'handles.nsemaphore',	
+                                                    'handles.ntimer',	'handles.nsection',	'handles.nmutant',	'ldrmodules.not_in_load',	'ldrmodules.not_in_init',	
+                                                    'ldrmodules.not_in_mem',	'ldrmodules.not_in_load_avg',	'ldrmodules.not_in_init_avg',	'ldrmodules.not_in_mem_avg',	
+                                                    'malfind.ninjections',	'malfind.commitCharge',	'malfind.protection',	'malfind.uniqueInjections',	'psxview.not_in_pslist',	
+                                                    'psxview.not_in_eprocess_pool',	'psxview.not_in_ethread_pool',	'psxview.not_in_pspcid_list',	'psxview.not_in_csrss_handles',	
+                                                    'psxview.not_in_session',	'psxview.not_in_deskthrd',	'psxview.not_in_pslist_false_avg',	'psxview.not_in_eprocess_pool_false_avg	psxview.not_in_ethread_pool_false_avg',	
+                                                    'psxview.not_in_pspcid_list_false_avg',	'psxview.not_in_csrss_handles_false_avg	psxview.not_in_session_false_avg',	'psxview.not_in_deskthrd_false_avg',	
+                                                    'modules.nmodules',	'svcscan.nservices',	'svcscan.kernel_drivers	svcscan.fs_drivers',	'svcscan.process_services',	'svcscan.shared_process_services',	
+                                                    'svcscan.interactive_process_services',	'svcscan.nactive',
+                                                    'callbacks.ncallbacks',	'callbacks.nanonymous',	'callbacks.ngeneric'], { "Classification": label_column}, 100)
+
+        ctabgan_instance.fit()
+        synthetic_data = ctabgan_instance.generate_samples()
+
+    else:
+        synthetic_data = None
+
+    return synthetic_data
 
 def binary_classification(X_train, y_train, X_test, y_test, num_trees):
     positive_class = "BenignTraffic"
@@ -76,19 +116,22 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
     # print(f'Recall Score: {recall}')
     print(f'f1 Score: {f1}')
 
-def show_confusion_matrix(y_test, y_pred, model, class_names, num_trees):
+def show_confusion_matrix(y_test, y_pred, malware_type, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
 
     plt.figure(figsize=(16, 12))
     sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
-    plt.title(f'Confusion Matrix for {model} Random Forest Classification with {num_trees} Trees')
+    plt.title(f'Confusion Matrix for {malware_type} Random Forest Classification with {num_trees} Trees')
     plt.show()
 
 def main():
     path = 'E:\\Malware Data Set\\Obfuscated-MalMem2022.csv'
     num_trees = 5000
+    malware_type = 'Ransomware'
+    gan_model = 'ctabgan'
+    num_generated_rows = 3000
 
     df = pd.read_csv(path)
 
@@ -96,8 +139,23 @@ def main():
     label_column = 'Category'
     class_column = 'Class'
 
+    #Clip the random string of letters and numbers in the label column
+    df['Category'] = df['Category'].str.split('-').str.slice(stop=2).str.join('-')
+
     #Only classify Spyware, Ransomware, and Trojan
     df = df[df[label_column] != 'Benign']
+
+    #Only classify one class at a time
+    df = df[df[label_column].str.contains(malware_type)]
+
+    #Convert df to csv for ctabgan
+    df.to_csv('E:\\Malware Data Set\\clipped.csv')
+    clipped_path = 'E:\\Malware Data set\\clipped.csv'
+    synthetic_data = generate_data(df, gan_model, 3000, label_column, clipped_path)
+
+    exit()
+    #Add the synthetic data to the data frame
+    df = df.append(synthetic_data, ignore_index=True)
 
     X = df.drop([label_column, class_column], axis=1)
     y = df[label_column]
@@ -118,7 +176,7 @@ def main():
     evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
 
     #Display confusion matrix
-    show_confusion_matrix(y_test_encoded, y_pred, 'Multi-class', class_names, num_trees)
+    show_confusion_matrix(y_test_encoded, y_pred, malware_type, class_names, num_trees)
 
 if __name__ == "__main__":
     main()
