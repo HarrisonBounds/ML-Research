@@ -52,11 +52,11 @@ def generate_data(df, gan_model, num_generated_rows, label_column, path):
                                                     'ldrmodules.not_in_mem',	'ldrmodules.not_in_load_avg',	'ldrmodules.not_in_init_avg',	'ldrmodules.not_in_mem_avg',	
                                                     'malfind.ninjections',	'malfind.commitCharge',	'malfind.protection',	'malfind.uniqueInjections',	'psxview.not_in_pslist',	
                                                     'psxview.not_in_eprocess_pool',	'psxview.not_in_ethread_pool',	'psxview.not_in_pspcid_list',	'psxview.not_in_csrss_handles',	
-                                                    'psxview.not_in_session',	'psxview.not_in_deskthrd',	'psxview.not_in_pslist_false_avg',	'psxview.not_in_eprocess_pool_false_avg	psxview.not_in_ethread_pool_false_avg',	
+                                                    'psxview.not_in_session',	'psxview.not_in_deskthrd',	'psxview.not_in_pslist_false_avg',	'psxview.not_in_eprocess_pool_false_avg', 'psxview.not_in_ethread_pool_false_avg',	
                                                     'psxview.not_in_pspcid_list_false_avg',	'psxview.not_in_csrss_handles_false_avg	psxview.not_in_session_false_avg',	'psxview.not_in_deskthrd_false_avg',	
                                                     'modules.nmodules',	'svcscan.nservices',	'svcscan.kernel_drivers	svcscan.fs_drivers',	'svcscan.process_services',	'svcscan.shared_process_services',	
                                                     'svcscan.interactive_process_services',	'svcscan.nactive',
-                                                    'callbacks.ncallbacks',	'callbacks.nanonymous',	'callbacks.ngeneric'], { "Classification": label_column}, 100)
+                                                    'callbacks.ncallbacks',	'callbacks.nanonymous',	'callbacks.ngeneric'], { "Classification": label_column }, 100)
 
         ctabgan_instance.fit()
         synthetic_data = ctabgan_instance.generate_samples()
@@ -148,12 +148,18 @@ def main():
     #Only classify one class at a time
     df = df[df[label_column].str.contains(malware_type)]
 
+    #Drop the 'Malware' column
+    df = df.drop(class_column, axis=1)
+
+    #Encode labels before use
+    label_encoder = LabelEncoder()
+    df[label_column] = label_encoder.fit_transform(df[label_column])
+
     #Convert df to csv for ctabgan
     df.to_csv('E:\\Malware Data Set\\clipped.csv')
     clipped_path = 'E:\\Malware Data set\\clipped.csv'
     synthetic_data = generate_data(df, gan_model, 3000, label_column, clipped_path)
 
-    exit()
     #Add the synthetic data to the data frame
     df = df.append(synthetic_data, ignore_index=True)
 

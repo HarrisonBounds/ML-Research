@@ -50,20 +50,20 @@ class DataPrep(object):
         self.df = self.df.replace(r' ', np.nan)
         self.df = self.df.fillna('empty')
         
-        # Dealing with empty values in numeric columns by replacing it with -9999999 and treating it as categorical mode 
-        all_columns= set(self.df.columns)
-        irrelevant_missing_columns = set(self.categorical_columns)
-        relevant_missing_columns = list(all_columns - irrelevant_missing_columns)
+        # # Dealing with empty values in numeric columns by replacing it with -9999999 and treating it as categorical mode 
+        # all_columns= set(self.df.columns)
+        # irrelevant_missing_columns = set(self.categorical_columns)
+        # relevant_missing_columns = list(all_columns - irrelevant_missing_columns)
         
-        for i in relevant_missing_columns:
-            if i in list(self.mixed_columns.keys()):
-                if "empty" in list(self.df[i].values):
-                    self.df[i] = self.df[i].apply(lambda x: -9999999 if x=="empty" else x )
-                    self.mixed_columns[i].append(-9999999)
-            else:
-                if "empty" in list(self.df[i].values):   
-                    self.df[i] = self.df[i].apply(lambda x: -9999999 if x=="empty" else x)
-                    self.mixed_columns[i] = [-9999999]
+        # for i in relevant_missing_columns:
+        #     if i in list(self.mixed_columns.keys()):
+        #         if "empty" in list(self.df[i].values):
+        #             self.df[i] = self.df[i].apply(lambda x: -9999999 if x=="empty" else x )
+        #             self.mixed_columns[i].append(-9999999)
+        #     else:
+        #         if "empty" in list(self.df[i].values):   
+        #             self.df[i] = self.df[i].apply(lambda x: -9999999 if x=="empty" else x)
+        #             self.mixed_columns[i] = [-9999999]
         
         # Dealing with skewed exponential numeric distributions by applying log transformation
         if self.log_columns:

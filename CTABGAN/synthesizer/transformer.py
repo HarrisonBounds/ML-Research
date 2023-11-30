@@ -3,7 +3,6 @@ import pandas as pd
 import torch
 from sklearn.mixture import BayesianGaussianMixture
 
-
 class DataTransformer():
     
     """
