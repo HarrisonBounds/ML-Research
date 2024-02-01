@@ -1,25 +1,15 @@
 import dask.dataframe as dd
-# from numba import jit, cuda
 import pandas as pd
 from sklearn.model_selection import train_test_split
-#from dask_ml.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-#import tensorflow as tf
-#from tensorflow import keras
-#from tensorflow.keras import layers
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 from sdv.single_table import CTGANSynthesizer
 from sdv.metadata import SingleTableMetadata
-import sys
-sys.path.append('E:\ML-Research\CTABGAN')
-from CTABGAN import ctabgan
-import glob
-
 
 def encode_labels(y_train, y_test):
     #Covert the text labels to numbers so the model can understand it
@@ -34,7 +24,6 @@ def encode_labels(y_train, y_test):
 
     return y_train_encoded, y_test_encoded, class_names
 
-# @jit(target_backend='cuda') #GPU decorator
 def generate_data(df, gan_model, num_generated_rows, label_column, path):
     if gan_model == 'ctgan':
         #Convert dataframe into metadata
@@ -124,111 +113,39 @@ def evaluate(y_test, y_pred, y_pred_prob, class_names):
     # print(f'Recall Score: {recall}')
     print(f'f1 Score: {f1}')
 
-def show_confusion_matrix(y_test, y_pred, malware_type, class_names, num_trees):
+def show_confusion_matrix(y_test, y_pred, class_names, num_trees):
     confusion_mat = confusion_matrix(y_test, y_pred)
 
     plt.figure(figsize=(16, 12))
     sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
-    plt.title(f'Confusion Matrix for {malware_type} Random Forest Classification with {num_trees} Trees')
+    plt.title(f'Confusion Matrix for IoT Data using Random Forest Classification with {num_trees} Trees')
     plt.show()
 
 def main():
-    mal_path = 'E:\\Malware Data Set\\Obfuscated-MalMem2022.csv'
+    iot_path = "E:\\CICIoT2023\\*.csv"
+    label_column = 'label'
     num_trees = 100
-    malware_type = 'Spyware'
-    gan_model = None
-    num_generated_rows = 500
-    mal = False
+    fraction = 0.1
 
-    if mal:
-        df = pd.read_csv(mal_path)
+    df = dd.read_csv(iot_path).sample(frac=fraction)
 
-        #Split data into training and testing
-        label_column = 'Category'
-        class_column = 'Class'
+    df = df.compute()
 
-        #Clip the random string of letters and numbers in the label column
-        df['Category'] = df['Category'].str.split('-').str.slice(stop=2).str.join('-')
+    X_train, X_test, y_train, y_test = train_test_split(df.drop(label_column, axis=1), df[label_column], test_size=0.20, shuffle=True)
 
-        #Only classify Spyware, Ransomware, and Trojan
-        df = df[df[label_column] != 'Benign']
+    #Get the encoded labels
+    y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
 
-        #Only classify one class at a time
-        df = df[df[label_column].str.contains(malware_type)]
+    #Model you want to run
+    y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
 
-        #Drop the 'Malware' column
-        df = df.drop(class_column, axis=1)
+    #Evaluate the model
+    evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
 
-        #Encode labels before use
-        # label_encoder = LabelEncoder()
-        # df[label_column] = label_encoder.fit_transform(df[label_column])
-
-        #Convert df to csv for ctabgan
-        # df.to_csv('E:\\Malware Data Set\\clipped.csv')
-        if gan_model:
-            clipped_path = 'E:\\Malware Data set\\clipped.csv'
-            synthetic_data = generate_data(df, gan_model, num_generated_rows, label_column, clipped_path)
-
-            #Turn the synthetic data into a dataframe
-            synthetic_df = pd.DataFrame(synthetic_data)
-
-            #Add the synthetic data to the data frame
-            df = pd.concat([df, synthetic_df], ignore_index=True)
-
-            X = df.drop([label_column], axis=1)
-            y = df[label_column]
-
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, shuffle=True)
-
-            # Clip the "Category" values
-            y_train = y_train.str.split('-').str.slice(stop=2).str.join('-')
-            y_test = y_test.str.split('-').str.slice(stop=2).str.join('-')
-
-            #Get the encoded labels
-            y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
-
-            #Model you want to run
-            y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
-
-            #Evaluate the model
-            evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
-
-            #Display confusion matrix
-            show_confusion_matrix(y_test_encoded, y_pred, malware_type, class_names, num_trees)
-
-    else:
-        iot_path = "E:\\CICIoT2023\\*.csv"
-        label_column = 'label'
-        fraction = 0.1
-
-        df = dd.read_csv(iot_path).sample(frac=fraction)
-
-        df = df.compute()
-
-        X_train, X_test, y_train, y_test = train_test_split(df.drop(label_column, axis=1), df[label_column], test_size=0.20, shuffle=True)
-
-        #Get the encoded labels
-        y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
-
-        #Model you want to run
-        y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
-
-        #Evaluate the model
-        evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
-
-        #Display confusion matrix
-        show_confusion_matrix(y_test_encoded, y_pred, malware_type, class_names, num_trees)
+    #Display confusion matrix
+    show_confusion_matrix(y_test_encoded, y_pred, class_names, num_trees)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
