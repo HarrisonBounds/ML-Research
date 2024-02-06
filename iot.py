@@ -105,10 +105,17 @@ def main():
     label_column = 'label'
     num_trees = 100
     fraction = 0.1
+    malware_type = 'Benign'
 
     df = dd.read_csv(iot_path).sample(frac=fraction)
 
     df = df.compute()
+
+    #Only classify one class at a time
+    df = df[df[label_column].str.contains(malware_type)]
+
+    # Exclude DDoS instances
+    #df = df[~df[label_column].str.contains("DDoS")]
 
     X_train, X_test, y_train, y_test = train_test_split(df.drop(label_column, axis=1), df[label_column], test_size=0.20, shuffle=True)
 
