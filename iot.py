@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
@@ -55,39 +56,15 @@ def multi_class_classification(X_train, y_train_encoded, X_test, num_trees):
     print("Predicting...")
     start_time = time.time()
     y_pred = classifier.predict(X_test)
-    y_pred_prob = classifier.predict_proba(X_test)
     end_time = time.time()
 
     print(f'It took {(end_time-start_time)/60} minutes to predict')
 
-    return y_pred, y_pred_prob
+    return y_pred
 
-def evaluate(y_test, y_pred, y_pred_prob, class_names):
-    print("=====================================================\n")
-    print("Overall")
-    print("=========")
-
-    accuracy = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    precision = precision_score(y_test, y_pred, average='weighted')
-
-    print(f'Accuracy: {accuracy}')
-    print(f'Precision: {precision}')
-    print(f'Recall Score: {recall}')
-    print(f'f1 Score: {f1}\n')
-
-    for i, c in enumerate(class_names):
-        class_accuracy = accuracy_score(y_test == i, y_pred == i)
-        class_f1 = f1_score(y_test == i, y_pred == i)
-        class_recall = recall_score(y_test == i, y_pred == i)
-        class_precision = precision_score(y_test == i, y_pred == i)
-
-        print(f'Class: {c}')
-        print(f'  Accuracy: {class_accuracy}')
-        print(f'  Precision: {class_precision}')
-        print(f'  Recall: {class_recall}')
-        print(f'  f1: {class_f1}\n')
+def evaluate(y_test, y_pred, class_names):
+   #Evaluate the model
+    print(classification_report(y_test, y_pred, target_names=class_names))
         
 
 def show_confusion_matrix(y_test, y_pred, class_names, num_trees):
@@ -105,14 +82,10 @@ def main():
     label_column = 'label'
     num_trees = 100
     fraction = 0.1
-    malware_type = 'Benign'
 
     df = dd.read_csv(iot_path).sample(frac=fraction)
 
     df = df.compute()
-
-    #Only classify one class at a time
-    df = df[df[label_column].str.contains(malware_type)]
 
     # Exclude DDoS instances
     #df = df[~df[label_column].str.contains("DDoS")]
@@ -123,10 +96,10 @@ def main():
     y_train_encoded, y_test_encoded, class_names = encode_labels(y_train, y_test)
 
     #Model you want to run
-    y_pred, y_pred_prob = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
+    y_pred = multi_class_classification(X_train, y_train_encoded, X_test, num_trees)
 
     #Evaluate the model
-    evaluate(y_test_encoded, y_pred, y_pred_prob, class_names)
+    evaluate(y_test_encoded, y_pred, class_names)
 
     #Display confusion matrix
     show_confusion_matrix(y_test_encoded, y_pred, class_names, num_trees)
