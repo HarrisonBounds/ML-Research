@@ -1,11 +1,12 @@
 {
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
-    "gan_model" : true,
+    "gan_model" : false,
     "mal_type" : false,
     "remove_benign" : false,
     "feature_selection" : true,
     "classification" : "RF",
     "label_column" : "Category",
-    "class_column" : "Class"
+    "class_column" : "Class",
+    "train_synthetic" : false
 }
