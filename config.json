@@ -5,7 +5,6 @@
     "num_generated_rows" : 10000,
     "mal_type" : "Trojan",
     "remove_benign" : true,
-    "feature_selection" : true,
     "classification" : "RF",
     "label_column" : "Category",
     "class_column" : "Class"
