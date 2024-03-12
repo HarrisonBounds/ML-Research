@@ -1,7 +1,7 @@
 {
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
-    "gan_model" : true,
+    "gan_model" : "CTAB",
     "num_generated_rows" : 10000,
     "mal_type" : "Trojan",
     "remove_benign" : true,
