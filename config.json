@@ -4,6 +4,7 @@
     "gan_model" : "CTAB",
     "num_generated_rows" : 5000,
     "mal_type" : "Ransomware",
+    "mal_type_class" : "Shade",
     "remove_benign" : true,
     "classification" : "XGB",
     "label_column" : "Category",
