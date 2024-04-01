@@ -2,7 +2,7 @@
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
     "gan_model" : "CTAB",
-    "num_generated_rows" : 5000,
+    "num_generated_rows" : 17500,
     "mal_type" : "Ransomware",
     "mal_type_class" : "Conti",
     "remove_benign" : true,
