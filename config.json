@@ -2,7 +2,7 @@
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
     "gan_model" : "CTAB",
-    "num_generated_rows" : 1500,
+    "num_generated_rows" : 500,
     "mal_type" : "Ransomware",
     "mal_type_class" : "Shade",
     "remove_benign" : true,

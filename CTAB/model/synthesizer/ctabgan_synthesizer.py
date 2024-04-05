@@ -346,7 +346,7 @@ class CTABGANSynthesizer:
                  num_channels=64,
                  l2scale=1e-5,
                  batch_size=500,
-                 epochs=150):
+                 epochs=100):
                  
 
         self.random_dim = random_dim
