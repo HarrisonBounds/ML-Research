@@ -1,12 +1,12 @@
 {
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
-    "gan_model" : "CTAB",
-    "num_generated_rows" : 500,
+    "gan_models" : ["CasTGAN", "DP-CGAN", "CT", "CTAB"],
+    "num_generated_rows" : 750,
     "mal_type" : "Ransomware",
-    "mal_type_class" : "Shade",
+    "mal_type_class" : "Conti",
     "remove_benign" : true,
-    "classification" : "XGB",
     "label_column" : "Category",
-    "class_column" : "Class"
+    "class_column" : "Class",
+    "classifiers" : ["RF", "XGB"]
 }
