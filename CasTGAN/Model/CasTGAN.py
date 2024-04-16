@@ -521,7 +521,7 @@ class CasTGAN(nn.Module):
                 lgb_params["metric"] = "mse"
             else:
                 lgb_params["objective"] = "multiclass"
-                lgb_params["num_class"] = col.column_unique_cats
+                lgb_params["num_class"] = 3 #Hard coded :(
                 lgb_params["metric"] = "multi_logloss"
                 lgb_params["is_unbalance"] = True
 
