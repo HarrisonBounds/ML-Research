@@ -1,7 +1,7 @@
 {
     "mal_path" : "E:\\Malware Data Set\\Obfuscated-MalMem2022.csv",
     "num_trees" : 500,
-    "gan_models" : ["TGAN"],
+    "gan_models" : ["CT, CTAB, GANBLR"],
     "num_generated_rows" : 5000,
     "mal_type" : "Ransomware",
     "mal_type_class" : "Conti",
