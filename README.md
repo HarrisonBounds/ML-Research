@@ -41,3 +41,24 @@
 | macro avg            | 0.68      | 0.67   | 0.67     | 2004    |
 | weighted avg         | 0.66      | 0.66   | 0.66     | 2004    |
 
+## GAN Classification
+
+### CTGAN
+- Overall Quality Score: 69.91%
+- Column Shapes: 84.15%
+- Column Pair Trends: 55.66%
+
+
+
+|                  | precision | recall | f1-score | support |
+|------------------|-----------|--------|----------|---------|
+| Spyware-180solutions |   0.36    |  0.05  |   0.09   |   399   |
+| Spyware-CWS          |   0.41    |  0.19  |   0.26   |   375   |
+| Spyware-Gator        |   0.31    |  0.99  |   0.47   |   467   |
+| Spyware-TIBS         |   0.82    |  0.38  |   0.52   |   270   |
+| Spyware-Transponder  |   0.46    |  0.14  |   0.22   |   493   |
+| accuracy             |           |        |          |  0.36   |
+| macro avg            |   0.47    |  0.35  |   0.31   |  2004   |
+| weighted avg         |   0.44    |  0.36  |   0.30   |  2004   |
+
+
