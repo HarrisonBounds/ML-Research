@@ -57,7 +57,7 @@
 | Spyware-Gator        |   0.31    |  0.99  |   0.47   |   467   |
 | Spyware-TIBS         |   0.82    |  0.38  |   0.52   |   270   |
 | Spyware-Transponder  |   0.46    |  0.14  |   0.22   |   493   |
-| accuracy             |           |        |          |  0.36   |
+| accuracy             |           |        |   0.36   |  2004   |
 | macro avg            |   0.47    |  0.35  |   0.31   |  2004   |
 | weighted avg         |   0.44    |  0.36  |   0.30   |  2004   |
 
