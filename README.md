@@ -1,5 +1,7 @@
 # ML-Research
 
+##Trojan
+
 |                | precision | recall | f1-score | support |
 |----------------|-----------|--------|----------|---------|
 | Trojan-Emotet  | 0.69      | 0.68   | 0.69     | 372     |
@@ -10,3 +12,30 @@
 | accuracy       |           |        | 0.73     | 1898    |
 | macro avg      | 0.73      | 0.73   | 0.73     | 1898    |
 | weighted avg   | 0.73      | 0.73   | 0.73     | 1898    |
+
+##Ransomware
+
+|                 | precision | recall | f1-score | support |
+|-----------------|-----------|--------|----------|---------|
+| Ransomware-Ako  | 0.49      | 0.54   | 0.51     | 379     |
+| Ransomware-Conti| 0.56      | 0.59   | 0.57     | 398     |
+| Ransomware-Maze | 0.62      | 0.54   | 0.58     | 402     |
+| Ransomware-Pysa | 0.61      | 0.51   | 0.56     | 338     |
+| Ransomware-Shade| 0.62      | 0.68   | 0.65     | 442     |
+| accuracy        |           |        | 0.58     | 1959    |
+| macro avg       | 0.58      | 0.57   | 0.57     | 1959    |
+| weighted avg    | 0.58      | 0.58   | 0.58     | 1959    |
+
+##Spyware
+
+|                      | precision | recall | f1-score | support |
+|----------------------|-----------|--------|----------|---------|
+| Spyware-180solutions | 0.70      | 0.61   | 0.65     | 399     |
+| Spyware-CWS          | 0.52      | 0.56   | 0.54     | 375     |
+| Spyware-Gator        | 0.73      | 0.85   | 0.78     | 467     |
+| Spyware-TIBS         | 0.87      | 0.79   | 0.83     | 270     |
+| Spyware-Transponder  | 0.57      | 0.52   | 0.54     | 493     |
+| accuracy             |           |        | 0.66     | 2004    |
+| macro avg            | 0.68      | 0.67   | 0.67     | 2004    |
+| weighted avg         | 0.66      | 0.66   | 0.66     | 2004    |
+
