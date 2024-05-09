@@ -1,6 +1,8 @@
-# ML-Research
+# ML-Research - Malware Classification with Generative Adversarial Networks
 
-##Trojan
+## Baseline Classification
+
+### Trojan
 
 |                | precision | recall | f1-score | support |
 |----------------|-----------|--------|----------|---------|
@@ -13,7 +15,7 @@
 | macro avg      | 0.73      | 0.73   | 0.73     | 1898    |
 | weighted avg   | 0.73      | 0.73   | 0.73     | 1898    |
 
-##Ransomware
+### Ransomware
 
 |                 | precision | recall | f1-score | support |
 |-----------------|-----------|--------|----------|---------|
@@ -26,7 +28,7 @@
 | macro avg       | 0.58      | 0.57   | 0.57     | 1959    |
 | weighted avg    | 0.58      | 0.58   | 0.58     | 1959    |
 
-##Spyware
+### Spyware
 
 |                      | precision | recall | f1-score | support |
 |----------------------|-----------|--------|----------|---------|
