@@ -43,7 +43,8 @@
 
 ## GAN Classification
 
-### CTGAN
+### Using CTGAN 
+### Train with Synthetic, Test with Real
 
 __Spyware__
 - Overall Quality Score: 69.91%
@@ -93,6 +94,28 @@ __Ransomware__
 | accuracy        |           |        |   0.27   |  1959   |
 | macro avg       |    0.30   |  0.25  |   0.18   |  1959   |
 | weighted avg    |    0.30   |  0.27  |   0.19   |  1959   |
+
+### Train with Synthetic + Real, Test with Real
+
+__Spyware__
+
+|                     | precision | recall | f1-score | support |
+|---------------------|-----------|--------|----------|---------|
+| Spyware-180solutions|   0.67    |  0.56  |   0.61   |   399   |
+|      Spyware-CWS    |   0.51    |  0.55  |   0.53   |   375   |
+|    Spyware-Gator    |   0.69    |  0.86  |   0.77   |   467   |
+|     Spyware-TIBS    |   0.85    |  0.76  |   0.80   |   270   |
+| Spyware-Transponder |   0.57    |  0.51  |   0.54   |   493   |
+|      accuracy       |           |        |   0.64   |   2004  |
+|      macro avg      |   0.66    |  0.65  |   0.65   |   2004  |
+|   weighted avg      |   0.64    |  0.64  |   0.64   |   2004  |
+
+__Trojan__
+
+
+
+
+
 
 
 
