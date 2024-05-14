@@ -44,6 +44,8 @@
 ## GAN Classification
 
 ### CTGAN
+
+**Spyware
 - Overall Quality Score: 69.91%
 - Column Shapes: 84.15%
 - Column Pair Trends: 55.66%
@@ -60,5 +62,23 @@
 | accuracy             |           |        |   0.36   |  2004   |
 | macro avg            |   0.47    |  0.35  |   0.31   |  2004   |
 | weighted avg         |   0.44    |  0.36  |   0.30   |  2004   |
+
+
+**Trojan
+- Overall Quality Score: 69.91%
+- Column Shapes: 84.15%
+- Column Pair Trends: 55.66%
+
+|               | precision | recall | f1-score | support |
+|---------------|-----------|--------|----------|---------|
+| Trojan-Emotet |   0.28    |  0.19  |   0.23   |   372   |
+| Trojan-Reconyc|   0.25    |  0.22  |   0.23   |   303   |
+| Trojan-Refroso|   0.30    |  0.80  |   0.43   |   391   |
+| Trojan-Scar   |   0.26    |  0.10  |   0.15   |   405   |
+| Trojan-Zeus   |   0.38    |  0.14  |   0.20   |   427   |
+| accuracy      |           |        |   0.29   |  1898   |
+| macro avg     |   0.29    |  0.29  |   0.25   |  1898   |
+| weighted avg  |   0.30    |  0.29  |   0.25   |  1898   |
+
 
 
