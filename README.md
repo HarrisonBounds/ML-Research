@@ -45,7 +45,7 @@
 
 ### CTGAN
 
-**Spyware
+** Spyware
 - Overall Quality Score: 69.91%
 - Column Shapes: 84.15%
 - Column Pair Trends: 55.66%
@@ -64,7 +64,7 @@
 | weighted avg         |   0.44    |  0.36  |   0.30   |  2004   |
 
 
-**Trojan
+** Trojan
 - Overall Quality Score: 69.91%
 - Column Shapes: 84.15%
 - Column Pair Trends: 55.66%
