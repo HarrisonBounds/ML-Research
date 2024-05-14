@@ -112,6 +112,18 @@ __Spyware__
 
 __Trojan__
 
+|                 | precision | recall | f1-score | support |
+|-----------------|-----------|--------|----------|---------|
+| Trojan-Emotet   |    0.70   |  0.67  |   0.68   |   372   |
+| Trojan-Reconyc  |    0.71   |  0.71  |   0.71   |   303   |
+| Trojan-Refroso  |    0.77   |  0.80  |   0.78   |   391   |
+| Trojan-Scar     |    0.71   |  0.70  |   0.70   |   405   |
+| Trojan-Zeus     |    0.81   |  0.81  |   0.81   |   427   |
+|   accuracy      |           |        |   0.74   |   1898  |
+|   macro avg     |    0.74   |  0.74  |   0.74   |   1898  |
+| weighted avg    |    0.74   |  0.74  |   0.74   |   1898  |
+
+
 
 
 
