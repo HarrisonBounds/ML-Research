@@ -45,12 +45,10 @@
 
 ### CTGAN
 
-** Spyware
+__Spyware__
 - Overall Quality Score: 69.91%
 - Column Shapes: 84.15%
 - Column Pair Trends: 55.66%
-
-
 
 |                  | precision | recall | f1-score | support |
 |------------------|-----------|--------|----------|---------|
@@ -64,10 +62,10 @@
 | weighted avg         |   0.44    |  0.36  |   0.30   |  2004   |
 
 
-** Trojan
-- Overall Quality Score: 69.91%
-- Column Shapes: 84.15%
-- Column Pair Trends: 55.66%
+__Trojan__
+- Overall Quality Score: 69.97%
+- Column Shapes: 84.34%
+- Column Pair Trends: 55.6%
 
 |               | precision | recall | f1-score | support |
 |---------------|-----------|--------|----------|---------|
@@ -79,6 +77,22 @@
 | accuracy      |           |        |   0.29   |  1898   |
 | macro avg     |   0.29    |  0.29  |   0.25   |  1898   |
 | weighted avg  |   0.30    |  0.29  |   0.25   |  1898   |
+
+__Ransomware__
+- Overall Quality Score: 69.05%
+- Column Shapes: 81.8%
+- Column Pair Trends: 56.36%
+
+|                 | precision | recall | f1-score | support |
+|-----------------|-----------|--------|----------|---------|
+| Ransomware-Ako  |    0.45   |  0.29  |   0.35   |   379   |
+| Ransomware-Conti|    0.13   |  0.03  |   0.04   |   398   |
+| Ransomware-Maze |    0.32   |  0.03  |   0.05   |   402   |
+| Ransomware-Pysa |    0.37   |  0.03  |   0.06   |   338   |
+| Ransomware-Shade|    0.25   |  0.90  |   0.39   |   442   |
+| accuracy        |           |        |   0.27   |  1959   |
+| macro avg       |    0.30   |  0.25  |   0.18   |  1959   |
+| weighted avg    |    0.30   |  0.27  |   0.19   |  1959   |
 
 
 
