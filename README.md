@@ -1,5 +1,7 @@
 # ML-Research - Malware Classification with Generative Adversarial Networks
 
+This research attemps to use Text_based Generative Adversarial Networks to produce a synthethic data set. The model is then trained on this data to increase the performance of malware anomaly detection.
+
 ## Baseline Classification
 
 ### Trojan
